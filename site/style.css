@@ -98,6 +98,14 @@ body.loaded .rise {
 }
 body.loaded .rise.d1 { transition-delay: 0.15s; }
 
+/* the wordmark animates in out of the black */
+body.preload .hero .wordmark { opacity: 0; transform: translateY(56px); }
+body.loaded .hero .wordmark {
+  opacity: 1;
+  transform: none;
+  transition: opacity 1.1s ease 0.35s, transform 1.1s cubic-bezier(0.22, 0.7, 0.2, 1) 0.35s;
+}
+
 /* ── Corner mark (fixed, docks in after the hero) ──────── */
 .nav-mark {
   position: fixed;
@@ -142,9 +150,9 @@ body.loaded .rise.d1 { transition-delay: 0.15s; }
   padding: 30px var(--gutter);
 }
 
-.nav-links { display: flex; gap: clamp(20px, 3vw, 40px); }
+.nav-links { display: flex; gap: clamp(20px, 3vw, 40px); color: var(--paper); }
 
-/* ── Hero ──────────────────────────────────────────────── */
+/* ── Hero — ink, the loading screen bleeds into it ─────── */
 .hero {
   min-height: 100svh;
   display: flex;
@@ -152,7 +160,12 @@ body.loaded .rise.d1 { transition-delay: 0.15s; }
   justify-content: space-between;
   padding-top: 120px;
   padding-bottom: 56px;
+  background: var(--ink);
+  color: var(--paper);
 }
+
+.hero .muted { color: var(--muted-dark); }
+.hero .wordmark { fill: var(--paper); }
 
 .hero-mark {
   display: flex;
@@ -166,7 +179,8 @@ body.loaded .rise.d1 { transition-delay: 0.15s; }
   width: clamp(220px, 30vmin, 310px);
   aspect-ratio: 1;
   object-fit: cover;
-  mix-blend-mode: multiply;
+  filter: invert(1) contrast(1.2);
+  mix-blend-mode: screen;
 }
 
 .hero-foot { display: flex; flex-direction: column; gap: 28px; }
@@ -347,4 +361,5 @@ body.loaded .rise.d1 { transition-delay: 0.15s; }
   html { scroll-behavior: auto; }
   #loader.zoom .loader-stage { transition: none; transform: none; }
   body.preload .rise { opacity: 1; transform: none; }
+  body.preload .hero .wordmark { opacity: 1; transform: none; }
 }

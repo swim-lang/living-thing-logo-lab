@@ -96,11 +96,12 @@
   );
   io.observe(heroMark);
 
-  // invert the mark while it floats over the ink sections (why + footer)
+  // invert the mark while it floats over the ink sections (hero, why, footer)
+  const hero = document.querySelector('.hero');
   function checkDark() {
-    if (!why) return;
-    const overDark = why.getBoundingClientRect().top < 68;
-    mark.classList.toggle('on-dark', overDark);
+    const overHero = hero && hero.getBoundingClientRect().bottom > 68;
+    const overWhy = why && why.getBoundingClientRect().top < 68;
+    mark.classList.toggle('on-dark', overHero || overWhy);
   }
   let ticking = false;
   window.addEventListener('scroll', () => {
