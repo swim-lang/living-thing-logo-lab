@@ -1,0 +1,568 @@
+<title>Living Thing — Logo Organism</title>
+<style>
+  :root {
+    --paper: #fdfdfc;
+    --ink: #0a0a0a;
+    --faint: rgba(10, 10, 10, 0.12);
+    --whisper: rgba(10, 10, 10, 0.05);
+    --dim: rgba(10, 10, 10, 0.45);
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0a0a0a;
+      --ink: #f2f2ef;
+      --faint: rgba(242, 242, 239, 0.16);
+      --whisper: rgba(242, 242, 239, 0.06);
+      --dim: rgba(242, 242, 239, 0.45);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0a0a0a;
+    --ink: #f2f2ef;
+    --faint: rgba(242, 242, 239, 0.16);
+    --whisper: rgba(242, 242, 239, 0.06);
+    --dim: rgba(242, 242, 239, 0.45);
+  }
+  :root[data-theme="light"] {
+    --paper: #fdfdfc;
+    --ink: #0a0a0a;
+    --faint: rgba(10, 10, 10, 0.12);
+    --whisper: rgba(10, 10, 10, 0.05);
+    --dim: rgba(10, 10, 10, 0.45);
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--faint);
+    flex: none;
+  }
+  header h1 {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  header h1 span { color: var(--dim); font-weight: 400; }
+  #genome-tag {
+    color: var(--dim);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  /* ---------- stage ---------- */
+  #stage {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    cursor: pointer;
+  }
+  #stage canvas { display: block; }
+  #wordmark {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    text-transform: lowercase;
+    margin-top: 8px;
+    padding-left: 0.42em; /* optically recenter letterspaced text */
+    user-select: none;
+  }
+  #stage-hint {
+    position: absolute;
+    bottom: 16px;
+    color: var(--dim);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  /* ---------- control rail ---------- */
+  #rail {
+    width: 292px;
+    flex: none;
+    border-left: 1px solid var(--faint);
+    overflow-y: auto;
+    padding: 20px 22px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+  fieldset { border: 0; display: flex; flex-direction: column; gap: 14px; }
+  legend {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding-bottom: 12px;
+  }
+
+  .ctl { display: flex; flex-direction: column; gap: 6px; }
+  .ctl-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .ctl-row output {
+    color: var(--dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 1px;
+    background: var(--faint);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    margin-top: -6.5px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 1px;
+    background: var(--faint);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+  }
+  input[type="range"]:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    flex: 1;
+    font: inherit;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 9px 0;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .btn.quiet { border-color: var(--faint); color: var(--dim); }
+  .btn.quiet:hover { border-color: var(--ink); color: var(--ink); background: transparent; }
+
+  #specimen {
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .note {
+    color: var(--dim);
+    font-size: 10px;
+    line-height: 1.7;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--faint);
+    padding-top: 14px;
+  }
+
+  @media (max-width: 720px) {
+    body { overflow: auto; }
+    main { flex-direction: column; }
+    #stage { min-height: 58vh; flex: none; }
+    #rail { width: auto; border-left: 0; border-top: 1px solid var(--faint); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* JS also checks this — organism holds still */
+  }
+</style>
+
+<header>
+  <h1>Living Thing <span>/ logo organism v0.1</span></h1>
+  <div id="genome-tag">GENOME LT-α</div>
+</header>
+
+<main>
+  <div id="stage" title="Click the organism to breed a variation">
+    <canvas id="cv" width="520" height="520" aria-label="Living Thing logo — a soft organic form that changes shape with the controls"></canvas>
+    <div id="wordmark">living thing</div>
+    <div id="stage-hint">click the organism to breed a variation</div>
+  </div>
+
+  <aside id="rail" aria-label="Logo controls">
+    <fieldset>
+      <legend>Form</legend>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-exp">Expression</label><output id="o-exp">74</output></div>
+        <input type="range" id="s-exp" min="0" max="100" value="74">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-com">Complexity</label><output id="o-com">38</output></div>
+        <input type="range" id="s-com" min="0" max="100" value="38">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-asy">Asymmetry</label><output id="o-asy">30</output></div>
+        <input type="range" id="s-asy" min="0" max="100" value="30">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-flo">Flow</label><output id="o-flo">55</output></div>
+        <input type="range" id="s-flo" min="0" max="100" value="55">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-bmp">Bump</label><output id="o-bmp">30</output></div>
+        <input type="range" id="s-bmp" min="0" max="100" value="30">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Motion</legend>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-bre">Breath</label><output id="o-bre">40</output></div>
+        <input type="range" id="s-bre" min="0" max="100" value="40">
+      </div>
+      <div class="ctl">
+        <div class="ctl-row"><label for="s-dri">Drift</label><output id="o-dri">25</output></div>
+        <input type="range" id="s-dri" min="0" max="100" value="25">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Specimen</legend>
+      <div class="btn-row">
+        <button type="button" class="btn" id="b-var">Variation</button>
+        <button type="button" class="btn quiet" id="b-org">Origin</button>
+      </div>
+      <div id="specimen">Specimen 001 · origin form</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Export</legend>
+      <div class="btn-row">
+        <button type="button" class="btn" id="b-svg">SVG</button>
+        <button type="button" class="btn" id="b-png">PNG</button>
+      </div>
+      <p class="note">Exports capture the organism exactly as posed — freeze a specimen for print, keep the genome alive on screen. One species, infinite individuals.</p>
+    </fieldset>
+  </aside>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     The genome: fixed harmonic structure = the logo's identity.
+     Sliders only modulate expression of these genes, so every pose
+     is recognisably the same organism.
+  ------------------------------------------------------------------ */
+  const ORIGIN_GENOME = {
+    harmonics: [
+      { k: 2, w: 0.72, phi: 1.15 },
+      { k: 3, w: 1.00, phi: 3.85 },
+      { k: 5, w: 0.34, phi: 0.90 },
+      { k: 7, w: 0.16, phi: 5.05 },
+    ],
+    bumps: [
+      { k: 9,  w: 0.62, phi: 2.70 },
+      { k: 13, w: 0.38, phi: 0.60 },
+    ],
+    asymPhi: 2.40, // phase of the k=1 (asymmetry) gene
+  };
+
+  let genome = structuredClone(ORIGIN_GENOME);
+  let specimenNo = 1;
+
+  const params = { exp: 74, com: 38, asy: 30, flo: 55, bmp: 30, bre: 40, dri: 25 };
+
+  /* ---------- shape math ---------- */
+  function shapeRadius(theta, t) {
+    const A = 0.10 + (params.exp / 100) * 0.62;           // overall deviation
+    const c = params.com / 100;                            // complexity blend
+    const drift = (params.dri / 100) * t * 0.00022;        // slow phase drift
+
+    let s = 0;
+    for (const h of genome.harmonics) {
+      const wc = h.k <= 3 ? (1.15 - c * 0.45) : (0.15 + c * 1.5);
+      s += h.w * wc * Math.sin(h.k * theta + h.phi + drift * h.k);
+    }
+    // asymmetry gene (k=1)
+    s += (params.asy / 100) * 0.85 * Math.sin(theta + genome.asymPhi + drift);
+
+    // flow: shapes the lobes — low = taut/pinched, high = soft/round
+    const flowExp = 1.9 - (params.flo / 100) * 1.25; // 1.9 → 0.65
+    s = Math.sign(s) * Math.pow(Math.abs(s) * 0.5, flowExp) * 2;
+
+    // bump gene: high-frequency surface texture, added after flow
+    // shaping so the bumps stay crisp at any flow setting
+    let b = 0;
+    for (const g of genome.bumps) b += g.w * Math.sin(g.k * theta + g.phi + drift * g.k);
+    s += (params.bmp / 100) * 0.55 * b;
+
+    return Math.max(0.12, 1 + A * s * 0.5);
+  }
+
+  function samplePoints(t, n) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const th = (i / n) * Math.PI * 2;
+      const r = shapeRadius(th, t);
+      pts.push([Math.cos(th) * r, Math.sin(th) * r]);
+    }
+    return pts;
+  }
+
+  function breathFactor(t) {
+    return 1 + Math.sin(t * 0.0011) * (params.bre / 100) * 0.16;
+  }
+
+  /* Square containment: center the pose and normalise its reach so the
+     mark always sits inside the square, with headroom reserved for the
+     breath so it never leaves the frame mid-inhale. */
+  function fitTransform(pts, breathDepth) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const p of pts) {
+      if (p[0] < minX) minX = p[0];
+      if (p[0] > maxX) maxX = p[0];
+      if (p[1] < minY) minY = p[1];
+      if (p[1] > maxY) maxY = p[1];
+    }
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    let m = 0, d = 0;
+    for (const p of pts) {
+      m = Math.max(m, Math.hypot(p[0] - cx, p[1] - cy));
+      d = Math.max(d, Math.hypot(p[0], p[1]));
+    }
+    return { cx, cy, k: 1 / (m + d * breathDepth) };
+  }
+
+  /* Catmull-Rom → cubic bezier through closed point loop */
+  function tracePath(ctx, pts) {
+    const n = pts.length;
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      ctx.bezierCurveTo(
+        p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
+        p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6,
+        p2[0], p2[1]
+      );
+    }
+    ctx.closePath();
+  }
+
+  function pathData(pts, cx, cy, scale) {
+    const n = pts.length;
+    const f = v => (v).toFixed(2);
+    const P = i => [cx + pts[(i + n) % n][0] * scale, cy + pts[(i + n) % n][1] * scale];
+    let d = `M ${f(P(0)[0])} ${f(P(0)[1])} `;
+    for (let i = 0; i < n; i++) {
+      const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+      d += `C ${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ` +
+           `${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ` +
+           `${f(p2[0])} ${f(p2[1])} `;
+    }
+    return d + 'Z';
+  }
+
+  /* ---------- canvas render ---------- */
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+  function inkColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#0a0a0a';
+  }
+  function faintColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue('--faint').trim() || 'rgba(10,10,10,0.12)';
+  }
+
+  function fitCanvas() {
+    const stage = document.getElementById('stage');
+    const size = Math.min(stage.clientWidth, stage.clientHeight - 80) * 0.86;
+    const px = Math.max(240, Math.min(560, size));
+    const dpr = window.devicePixelRatio || 1;
+    cv.style.width = px + 'px';
+    cv.style.height = px + 'px';
+    cv.width = px * dpr;
+    cv.height = px * dpr;
+  }
+
+  function draw(t) {
+    const dpr = window.devicePixelRatio || 1;
+    const W = cv.width / dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, W);
+
+    // the square the mark is constrained to — hairline construction guide
+    ctx.strokeStyle = faintColor();
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, W - 1, W - 1);
+
+    ctx.save();
+    ctx.translate(W / 2, W / 2);
+
+    const breathe = !reduceMotion.matches;
+    const pts = samplePoints(t, 180);
+    const fit = fitTransform(pts, breathe ? (params.bre / 100) * 0.16 : 0);
+    const bf = breathe ? breathFactor(t) : 1;
+    const k = W * 0.42 * fit.k; // mark reaches at most 84% of the square
+    tracePath(ctx, pts.map(p => [(p[0] * bf - fit.cx) * k, (p[1] * bf - fit.cy) * k]));
+    ctx.fillStyle = inkColor();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  let raf;
+  function loop(t) {
+    draw(t);
+    raf = requestAnimationFrame(loop);
+  }
+
+  /* ---------- controls ---------- */
+  const sliders = { exp: 's-exp', com: 's-com', asy: 's-asy', flo: 's-flo', bmp: 's-bmp', bre: 's-bre', dri: 's-dri' };
+  for (const [key, id] of Object.entries(sliders)) {
+    const el = document.getElementById(id);
+    const out = document.getElementById(id.replace('s-', 'o-'));
+    el.addEventListener('input', () => {
+      params[key] = +el.value;
+      out.textContent = el.value;
+      updateGenomeTag();
+    });
+  }
+
+  const specimenEl = document.getElementById('specimen');
+  function breedVariation() {
+    specimenNo++;
+    for (const h of genome.harmonics) {
+      h.phi += (Math.random() - 0.5) * 0.8;
+      h.w = Math.max(0.08, h.w * (0.88 + Math.random() * 0.24));
+    }
+    for (const g of genome.bumps) {
+      g.phi += (Math.random() - 0.5) * 0.9;
+      g.w = Math.max(0.08, g.w * (0.88 + Math.random() * 0.24));
+    }
+    genome.asymPhi += (Math.random() - 0.5) * 1.1;
+    specimenEl.textContent = `Specimen ${String(specimenNo).padStart(3, '0')} · bred variation`;
+    updateGenomeTag();
+  }
+  function resetOrigin() {
+    genome = structuredClone(ORIGIN_GENOME);
+    specimenEl.textContent = `Specimen ${String(specimenNo).padStart(3, '0')} → origin form`;
+    updateGenomeTag();
+  }
+  document.getElementById('b-var').addEventListener('click', breedVariation);
+  document.getElementById('b-org').addEventListener('click', resetOrigin);
+  document.getElementById('stage').addEventListener('click', e => {
+    if (e.target === cv) breedVariation();
+  });
+
+  function updateGenomeTag() {
+    const code = [params.exp, params.com, params.asy, params.flo, params.bmp]
+      .map(v => v.toString(36).padStart(2, '0')).join('');
+    const phiSum = genome.harmonics.reduce((a, h) => a + h.phi, 0);
+    document.getElementById('genome-tag').textContent =
+      `GENOME LT-α · ${code.toUpperCase()} · ${(phiSum % 10).toFixed(2)}`;
+  }
+  updateGenomeTag();
+
+  /* ---------- export ---------- */
+  function download(name, blob) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  function currentSVG(size) {
+    const t = performance.now();
+    const pts = samplePoints(t, 180);
+    const fit = fitTransform(pts, 0);
+    const k = size * 0.42 * fit.k;
+    const fitted = pts.map(p => [(p[0] - fit.cx) * k, (p[1] - fit.cy) * k]);
+    const body = `<path fill="#0a0a0a" d="${pathData(fitted, size / 2, size / 2, 1)}"/>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${body}</svg>`;
+  }
+
+  document.getElementById('b-svg').addEventListener('click', () => {
+    const svg = currentSVG(512);
+    download(`living-thing-specimen-${String(specimenNo).padStart(3, '0')}.svg`,
+      new Blob([svg], { type: 'image/svg+xml' }));
+  });
+
+  document.getElementById('b-png').addEventListener('click', () => {
+    const size = 1024;
+    const off = document.createElement('canvas');
+    off.width = off.height = size;
+    const c = off.getContext('2d');
+    const img = new Image();
+    const svgBlob = new Blob([currentSVG(size)], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(svgBlob);
+    img.onload = () => {
+      c.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      off.toBlob(b => download(`living-thing-specimen-${String(specimenNo).padStart(3, '0')}.png`, b), 'image/png');
+    };
+    img.src = url;
+  });
+
+  /* ---------- go ---------- */
+  window.addEventListener('resize', fitCanvas);
+  fitCanvas();
+  if (reduceMotion.matches) {
+    draw(0);
+    reduceMotion.addEventListener?.('change', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); });
+    // still redraw on any input so sliders work without motion
+    document.getElementById('rail').addEventListener('input', () => draw(performance.now()));
+    document.getElementById('rail').addEventListener('click', () => draw(performance.now()));
+    document.getElementById('stage').addEventListener('click', () => draw(performance.now()));
+  }
+  raf = requestAnimationFrame(loop);
+})();
+</script>
