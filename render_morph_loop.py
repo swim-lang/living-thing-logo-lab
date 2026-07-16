@@ -26,8 +26,19 @@ T_SECONDS = 10.0
 N_SAMPLES = 900  # contour samples per frame
 
 
+PROFILE = 'calm'  # set via CLI: calm | dramatic
+
+
 def morphed_params(u):
     """Slider values as loop-safe sinusoids around the tool's defaults."""
+    if PROFILE == 'dramatic':
+        return {
+            'exp': 60 + 34 * math.sin(TAU * 1 * u + 0.7) + 8 * math.sin(TAU * 3 * u + 1.9),
+            'com': 50 + 40 * math.sin(TAU * 2 * u + 4.0),
+            'asy': 50 + 45 * math.sin(TAU * 2 * u + 2.1),
+            'flo': 45 + 35 * math.sin(TAU * 2 * u + 1.2),
+            'bmp': 45 + 40 * math.sin(TAU * 3 * u + 5.3),
+        }
     return {
         'exp': 74 + 16 * math.sin(TAU * 1 * u + 0.7),
         'com': 38 + 20 * math.sin(TAU * 1 * u + 4.0),
@@ -44,8 +55,10 @@ def shape_radius(theta, u, p):
 
     # No rotation: instead of a revolving phase drift, each gene's phase
     # sways around its home position (loop-safe, integer frequency).
+    wob = 0.75 if PROFILE == 'dramatic' else 0.30
+
     def wobble(k):
-        return 0.30 * math.sin(TAU * u + k * 1.7)
+        return wob * math.sin(TAU * u + k * 1.7)
 
     s = 0.0
     for k, w, phi in HARMONICS:
@@ -110,19 +123,23 @@ def render_sequence(out_dir, size, fps, fit):
 
 
 def main():
+    global PROFILE
     out = Path('/Users/kiraknoop/Desktop/Claude/LivingThing/exports')
     out.mkdir(parents=True, exist_ok=True)
     work = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('.')
+    PROFILE = sys.argv[2] if len(sys.argv) > 2 else 'calm'
+    tag = '' if PROFILE == 'calm' else f'-{PROFILE}'
+    print(f'profile: {PROFILE}')
 
     print('computing square fit across the loop...')
     fit = compute_fit()
 
     # --- MP4: 1080px @ 30fps ---
     print('rendering mp4 frames...')
-    mp4_frames = work / 'frames_mp4'
+    mp4_frames = work / f'frames_mp4{tag}'
     render_sequence(mp4_frames, 1080, 30, fit)
     ffmpeg = get_ffmpeg_exe()
-    mp4_path = out / 'living-thing-morph-loop-1080.mp4'
+    mp4_path = out / f'living-thing-morph-loop{tag}-1080.mp4'
     subprocess.run([
         ffmpeg, '-y', '-framerate', '30', '-i', str(mp4_frames / '%04d.png'),
         '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18',
@@ -135,7 +152,7 @@ def main():
     n = int(round(T_SECONDS * 25))
     frames = [render_frame(f / n, 540, fit).convert('P', palette=Image.ADAPTIVE, colors=64)
               for f in range(n)]
-    gif_path = out / 'living-thing-morph-loop-540.gif'
+    gif_path = out / f'living-thing-morph-loop{tag}-540.gif'
     frames[0].save(gif_path, save_all=True, append_images=frames[1:],
                    duration=40, loop=0, optimize=True)
     print('wrote', gif_path)
